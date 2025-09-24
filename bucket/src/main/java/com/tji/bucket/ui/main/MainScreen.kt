@@ -51,7 +51,6 @@ fun MainScreen(
     val loginUiState by viewModel.loginViewModel.uiState.collectAsState()
     val links by viewModel.links.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val linkSerialNumbers by viewModel.linkSerialNumbers.collectAsState()
 
     // 加载用户数据
     LaunchedEffect(loginUiState.userId) {
@@ -79,18 +78,6 @@ fun MainScreen(
                 style = MaterialTheme.typography.bodyLarge
             )
             else -> {
-               Log.d("ssssssssssssssssss","${userData.getUserId()}")
-
-                DataReportManager.getInstance().getUserSn(2.toString()) { success, message, snList ->
-                    if (success) {
-                        // 处理成功情况，打印所有 SN
-                        println("获取成功，SN 列表: $snList")
-                    } else {
-                        // 处理失败情况
-                        println("失败: $message")
-                    }
-                }
-
                 LazyColumn(
                     modifier = Modifier.padding(padding),
                     contentPadding = PaddingValues(16.dp),
@@ -114,29 +101,8 @@ fun MainScreen(
 @Preview(showBackground = true)
 @Composable
 fun PreviewMainScreen() {
-    val fakeLinkRepository = LinkRepo()
-    val fakeSwitchRepository = SwitchRepo()
-    val authRepository = AuthRepo()
-    val loginViewModel = LoginViewModel(authRepository)
-
-    // 模拟登录
-    LaunchedEffect(Unit) {
-        loginViewModel.login("test_user", "password", true) { _, _ -> }
-    }
-
-    val mainViewModel = MainViewModel(
-        LinkViewModel(fakeLinkRepository),
-        SwitchViewModel(fakeSwitchRepository),
-        loginViewModel
-    )
-
-    MaterialTheme {
-        MainScreen(
-            viewModel = mainViewModel,
-            onBack = {}
-        )
-    }
 }
+
 
 @Composable
 fun SwitchItemComposable(linkSn: String, switch: Switch, viewModel: MainViewModel) {
@@ -150,8 +116,6 @@ fun SwitchItemComposable(linkSn: String, switch: Switch, viewModel: MainViewMode
             )
         )
     }
-
-
     SwitchItem(
         linkSn = linkSn,
         switch = switch,

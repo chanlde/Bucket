@@ -1,13 +1,5 @@
 package com.tji.bucket.data.model
 
-//data class Switch(
-//    val id: String,
-//    val isOnline: Boolean,
-//    val version: String,
-//    val info: String,
-//    val currentAngle: Int
-//)
-
 data class Switch(
     val serialNumber: String,     // HydroDevice序列号
     val deviceName: String,       // HydroDevice名称

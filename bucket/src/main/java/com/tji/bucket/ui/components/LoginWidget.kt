@@ -28,6 +28,8 @@ import com.tji.bucket.ui.theme.LoginColors
 import com.tji.bucket.util.ToastUtils
 import com.tji.bucket.data.viewmodel.MainViewModel
 import com.tji.bucket.data.viewmodel.SwitchViewModel
+import com.tji.bucket.service.MqttEventHandler
+import com.tji.bucket.service.MqttSubscriptionManager
 import com.tji.bucket.util.userData
 import com.tji.bucket.util.userData.updateMqttConfig
 
@@ -89,26 +91,34 @@ fun LoginWidget(
     var accountError by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf("") }
 
-    account = ("17302516544")
+    account = ("yj_test01")
     password = ("123456")
 
     userData.setUserId(account)
 
     fun handleLogin() {
         viewModel.login(account, password, rememberMe) { loginSuccess, errorMsg ->
-            Log.d("Login", "loginSuccess: $loginSuccess, errorMsg: $errorMsg")
-
             if (loginSuccess) {
                 onLogin(Login(account, password, rememberMe))
-                Log.d("Login", "登录成功")
-
                 updateMqttConfig(username = account)
-
-
             } else {
-                accountError = errorMsg.toString()  // 设置错误信息
-                passwordError = errorMsg.toString()
-                ToastUtils.showToast("登录失败,$accountError")
+                if (errorMsg != null) {
+                    if (errorMsg.contains("账号")) {
+                        accountError = errorMsg
+                        passwordError = ""
+                    } else if (errorMsg.contains("密码")) {
+                        passwordError = errorMsg
+                        accountError = ""
+                    } else {
+                        // 其他错误
+                        accountError = errorMsg
+                        passwordError = errorMsg
+                    }
+                } else {
+                    accountError = "登录失败，请重试"
+                    passwordError = "登录失败，请重试"
+                }
+                ToastUtils.showToast("登录失败: $errorMsg")
             }
         }
     }
@@ -445,19 +455,21 @@ fun LoginWidgetPreview() {
     val fakeLinkRepository = LinkRepo()
     val fakeSwitchRepository = SwitchRepo()
     val authRepository = AuthRepo()
+    val mqttEventHandler = MqttEventHandler(fakeLinkRepository)
 
     val mainViewModel = MainViewModel(
         LinkViewModel(fakeLinkRepository),
         SwitchViewModel(fakeSwitchRepository),
-        LoginViewModel(authRepository)
+        LoginViewModel(authRepository),
+        MqttSubscriptionManager(mqttEventHandler)
+
     )
 
     LoginWidget(
-        modifier = Modifier.fillMaxSize(),
         isLoading = false,
-        onLogin = { login -> Log.d("Preview", "Login: $login") },
-        onDeveloperModeClick = { Log.d("Preview", "Developer Mode Clicked") },
-        onForgotPassword = { Log.d("Preview", "Forgot Password Clicked") },
-        viewModel = mainViewModel // Note: For preview, you may need a mock ViewModel
+        onLogin = { /* Handle login */ },
+        onDeveloperModeClick = { /* Handle developer mode click */ },
+        viewModel = mainViewModel
     )
+
 }

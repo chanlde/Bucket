@@ -163,7 +163,7 @@ class DataReportManager private constructor() {
             return
         }
 
-        scope.launch {
+        scope.launch(Dispatchers.IO) {
             val result = executeGet(
                 endpoint = "/userManager/user/login",
                 params = mapOf("account" to account, "password" to password),
@@ -203,7 +203,6 @@ class DataReportManager private constructor() {
                     }
                 }
             }
-
         }
     }
 
@@ -219,7 +218,7 @@ class DataReportManager private constructor() {
             return
         }
 
-        scope.launch {
+        scope.launch( Dispatchers.IO) {
             val result = executeGet(
                 endpoint = "/userManager/user/getInfo",
                 params = mapOf("id" to userId),
@@ -246,7 +245,7 @@ class DataReportManager private constructor() {
     }
 
     fun getUserSn(userId: String, callback: (Boolean, String, List<String>?) -> Unit) {
-        scope.launch {
+        scope.launch( Dispatchers.IO) {
             // 发送 HTTP 请求
             val result = executeGet(
                 endpoint = "/productManager/relationUserSn/list",

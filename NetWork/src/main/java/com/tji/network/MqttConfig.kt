@@ -42,7 +42,4 @@ data class MQTTConfig(
         return "$subscribeTopic$serialNumber/lifecycle"
     }
 
-
-
-
 }

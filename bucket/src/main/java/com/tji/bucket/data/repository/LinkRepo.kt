@@ -4,63 +4,85 @@ import android.util.Log
 import com.tji.bucket.data.model.LinkDevice
 import com.tji.bucket.data.model.Switch
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class LinkRepo : LinkRepository {
 
-    companion object {
-        private const val TAG = "FakeLinkRepository"
-        private const val MOCK_SERIAL_NUMBER = "E46424468B643D28"
+    private val _links = MutableStateFlow<List<LinkDevice>>(emptyList())
+    override val links: StateFlow<List<LinkDevice>> = _links.asStateFlow()
+
+    override suspend fun updateLinkDevice(linkDevice: LinkDevice) {
+        _links.update { current ->
+            val updatedList = current.toMutableList()
+            val existingIndex = current.indexOfFirst { it.serial_number == linkDevice.serial_number }
+            if (existingIndex >= 0) {
+                updatedList[existingIndex] = linkDevice
+            } else {
+                updatedList.add(linkDevice)
+            }
+            updatedList
+        }
     }
 
-    override suspend fun getSwitchFormLink(sn: String): List<Switch> {
-        delay(800) // 模拟网络延迟
-        Log.d(TAG, "获取 Link 设备 $sn 的 Switch 列表")
-        return if (sn == MOCK_SERIAL_NUMBER) emptyList() else emptyList()
+    override suspend fun addSubDevice(linkSn: String, switch: Switch) {
+        _links.update { current ->
+            current.map { linkDevice ->
+                if (linkDevice.serial_number == linkSn) {
+                    linkDevice.copy(subDevices = linkDevice.subDevices + switch)
+                } else {
+                    linkDevice
+                }
+            }
+        }
     }
 
-    override suspend fun getLinkBySerialNumber(sn: String): LinkDevice? {
-        delay(200) // 模拟网络延迟
-        Log.d(TAG, "获取 Link 设备: $sn")
-        return if (sn == MOCK_SERIAL_NUMBER) {
-            LinkDevice(
-                event_type = "device_status",
-                serial_number = MOCK_SERIAL_NUMBER,
-                deviceName = "",
-                deviceType = "",
-                manufacturer = "",
-                deviceModel = "",
-                isOnline = false,
-                hwVersion = "",
-                swVersion = "",
-                uptime = 0,
-                deviceConfig = "",
-                subDevices = emptyList(),
-                timestamp = System.currentTimeMillis().toString()
-            )
-        } else null
+    override suspend fun removeSubDevice(linkSn: String, switchSn: String) {
+        _links.update { current ->
+            current.map { linkDevice ->
+                if (linkDevice.serial_number == linkSn) {
+                    linkDevice.copy(
+                        subDevices = linkDevice.subDevices.filterNot { it.serialNumber == switchSn }
+                    )
+                } else {
+                    linkDevice
+                }
+            }
+        }
     }
 
-    override suspend fun refreshLinkStatus(sn: String): LinkDevice? {
-        delay(500) // 模拟网络延迟
-        Log.d(TAG, "刷新 Link 设备状态: $sn")
-        return if (sn == MOCK_SERIAL_NUMBER) {
-            LinkDevice(
-                event_type = "device_status",
-                serial_number = MOCK_SERIAL_NUMBER,
-                deviceName = "",
-                deviceType = "",
-                manufacturer = "",
-                deviceModel = "",
-                isOnline = false,
-                hwVersion = "",
-                swVersion = "",
+    override suspend fun updateLinkDeviceStatus(serialNumber: String, isOnline: Boolean) {
+        _links.update { current ->
+            current.map { link ->
+                if (link.serial_number == serialNumber) {
+                    link.copy(isOnline = isOnline)
+                } else {
+                    link
+                }
+            }
+        }
+    }
 
-                uptime = 0,
-                deviceConfig = "",
-                subDevices = emptyList(),
-                timestamp = System.currentTimeMillis().toString()
-            )
-        } else null
+    override suspend fun updateSubDevice(linkSn: String, updatedSwitch: Switch) {
+        _links.update { current ->
+            current.map { link ->
+                if (link.serial_number == linkSn) {
+                    link.copy(
+                        subDevices = link.subDevices.map { switch ->
+                            if (switch.serialNumber == updatedSwitch.serialNumber) {
+                                updatedSwitch
+                            } else {
+                                switch
+                            }
+                        }
+                    )
+                } else {
+                    link
+                }
+            }
+        }
     }
 
 }

@@ -10,3 +10,5 @@ data class Login(
 data class loginResult(val success: Boolean, val message: String?)
 
 data class AuthResult(val success: Boolean, val message: String?, val userData: Any?)
+
+data class getLinksResult(val success: Boolean, val message: String?, val userData: List<String>)

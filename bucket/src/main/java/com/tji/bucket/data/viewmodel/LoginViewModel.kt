@@ -31,12 +31,13 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel(),
                 // 调用 login suspend 函数
                 val loginResult = authRepository.login(account, password)
                 if (loginResult.success) {
-                    Log.d(TAG, "登录成功")
                     val userId = DataReportManager.getInstance().userId?.toString() ?: "unknown"
+                    Log.d(TAG, "登录成功,$userId")
+
                     // 调用 auth suspend 函数
                     val authResult = authRepository.auth(userId)
+
                     if (authResult.success) {
-                        Log.d(TAG, "认证成功")
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             isLoggedIn = true,
@@ -83,9 +84,11 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel(),
         _uiState.value = _uiState.value.copy(errorMessage = null)
     }
 
-    override suspend fun getAllLinks(): List<String> {
-        val links = authRepository.getAllLinks()
-        Log.d("LinkViewModel", "All links: $links")
-        return links
+    override suspend fun getLinksForUser(userId: String): List<String> {
+        val links = authRepository.getLinksForUser(userId)
+
+        Log.d(TAG, "All links:$userId, $links")
+
+        return links.userData
     }
 }

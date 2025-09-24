@@ -3,6 +3,7 @@ package com.tji.bucket.ui.components
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -10,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,7 +40,11 @@ fun SwitchItem(
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE7F1EE),      // 设置按钮背景颜色
+            contentColor = Color(0xFF020817)      // 设置按钮文本颜色
+        )
     ) {
         Column(
             modifier = Modifier
@@ -47,7 +53,9 @@ fun SwitchItem(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(0.dp) // 去除默认的内边距
+
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
@@ -57,10 +65,11 @@ fun SwitchItem(
                     Spacer(modifier = Modifier.width(8.dp))
                     StatusChip(switch.isOnline)
                 }
+
                 Spacer(modifier = Modifier.weight(1f))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    DeviceInfoButton(switch = switch, modifier = modifier)
-                }
+
+                DeviceInfoButton(switch = switch)
+
             }
 
             HorizontalDivider(
@@ -90,11 +99,25 @@ fun SwitchItem(
                 .fillMaxWidth()
                 .padding(bottom = 10.dp)
         ) {
-            Button(onClick = { updateAngleAndControl(90f) }) {
+            Button(
+                onClick = { updateAngleAndControl(90f) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,      // 设置按钮背景颜色
+                    contentColor = Color(0xFF020817)      // 设置按钮文本颜色
+                )
+            ) {
                 Text("打开")
             }
+
             Spacer(modifier = Modifier.width(50.dp))
-            Button(onClick = { updateAngleAndControl(0f) }) {
+
+            Button(
+                onClick = { updateAngleAndControl(0f) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,      // 设置按钮背景颜色
+                    contentColor = Color(0xFF020817)      // 设置按钮文本颜色
+                )
+            ) {
                 Text("关闭")
             }
         }

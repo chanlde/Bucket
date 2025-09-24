@@ -14,6 +14,7 @@ interface LinkViewModelInterface {
     val uiState: StateFlow<DeviceUiState>
     val isLoading: StateFlow<Boolean>
     val errorMessage: StateFlow<String?>
+    val links: StateFlow<List<LinkDevice>>
 
     /**
      * 加载指定用户ID的链接设备数据。
@@ -80,7 +81,7 @@ interface LoginViewModelInterface {
      */
     fun clearErrorMessage()
 
-    suspend fun getAllLinks(): List<String>
+    suspend fun getLinksForUser(userId: String): List<String>
 
 }
 

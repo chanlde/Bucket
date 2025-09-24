@@ -4,16 +4,30 @@ import com.tji.bucket.data.model.AuthResult
 import com.tji.bucket.data.model.LinkDevice
 import com.tji.bucket.data.model.Switch
 import com.tji.bucket.data.model.SwitchControlParms
+import com.tji.bucket.data.model.getLinksResult
 import com.tji.bucket.data.model.loginResult
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * 设备数据仓库接口，定义设备相关的数据访问方法。
  */
 interface LinkRepository {
-    suspend fun getSwitchFormLink(sn: String): List<Switch>
-    suspend fun getLinkBySerialNumber(sn: String): LinkDevice?
-    suspend fun refreshLinkStatus(sn: String): LinkDevice?
+
+    val links: StateFlow<List<LinkDevice>>
+
+
+    suspend fun updateLinkDevice(linkDevice: LinkDevice)
+
+    suspend fun addSubDevice(linkSn: String, switch: Switch)
+
+    suspend fun removeSubDevice(linkSn: String, switchSn: String)
+
+    suspend fun updateLinkDeviceStatus(serialNumber: String, isOnline: Boolean)
+
+    suspend fun updateSubDevice(linkSn: String, updatedSwitch: Switch)
+
 
 }
 
@@ -30,7 +44,6 @@ interface SwitchRepository {
  */
 interface AuthRepository {
     // 获取用户关联的设备列表
-    suspend fun getLinksForUser(sn: String): List<LinkDevice>
 
     // 执行登录操作，返回登录结果
     suspend fun login(account: String, password: String): loginResult
@@ -38,7 +51,7 @@ interface AuthRepository {
     // 执行认证操作，返回认证结果
     suspend fun auth(userId: String): AuthResult
 
-    suspend fun getAllLinks(): List<String>
+    suspend fun getLinksForUser(userId: String): getLinksResult
 
     // 执行登出操作
     suspend fun logout()

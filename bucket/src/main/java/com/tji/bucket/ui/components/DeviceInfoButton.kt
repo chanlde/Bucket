@@ -22,24 +22,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.composables.InfoCircle
 import com.tji.bucket.R
 import com.tji.bucket.data.model.Switch
 
 @Composable
 fun DeviceInfoButton(
     switch: Switch,
-    modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
     // IconButton 替代 Box
     IconButton(
         onClick = { showDialog = true },
+        modifier = Modifier
+            .size(24.dp) // 设置按钮整体大小
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.info),
+            imageVector  = InfoCircle,
             contentDescription = "显示设备信息",
-            modifier = Modifier.size(24.dp)  // 图标尺寸
+            modifier = Modifier
+                .size(24.dp) // 图标尺寸与按钮相同
         )
     }
 

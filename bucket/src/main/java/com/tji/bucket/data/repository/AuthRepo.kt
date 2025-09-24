@@ -1,21 +1,20 @@
 package com.tji.bucket.data.repository
 
+import android.util.Log
 import com.dji.network.DataReportManager
 import com.tji.bucket.data.model.AuthResult
 import com.tji.bucket.data.model.LinkDevice
+import com.tji.bucket.data.model.getLinksResult
 import com.tji.bucket.data.model.loginResult
 import kotlinx.coroutines.delay
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 /**
  * 真实的认证仓库实现，基于 DataReportManager。
  */
 class AuthRepo : AuthRepository {
-    override suspend fun getLinksForUser(sn: String): List<LinkDevice> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun login(account: String, password: String): loginResult = suspendCoroutine { continuation ->
         DataReportManager.getInstance().login(account, password) { success, message ->
             continuation.resume(loginResult(success, message))
@@ -34,8 +33,12 @@ class AuthRepo : AuthRepository {
         // 示例：DataReportManager.getInstance().logout()
     }
 
-    override suspend fun getAllLinks(): List<String> {
-        delay(500)
-        return listOf("E46424468B643D28","E46424468B294D28")
+
+    override suspend fun getLinksForUser(userId: String): getLinksResult = suspendCoroutine { continuation ->
+        DataReportManager.getInstance().getUserSn(userId) { success, message, userData ->
+            continuation.resume(getLinksResult(success, message, userData ?: emptyList()))  // 返回成功结果
+        }
     }
+
+
 }

@@ -13,6 +13,8 @@ import com.tji.bucket.data.viewmodel.SwitchViewModel
 import com.tji.bucket.data.vminterface.LinkViewModelInterface
 import com.tji.bucket.data.vminterface.LoginViewModelInterface
 import com.tji.bucket.data.vminterface.SwitchViewModelInterface
+import com.tji.bucket.service.MqttEventHandler
+import com.tji.bucket.service.MqttSubscriptionManager
 
 /**
  * 主视图模型工厂，用于创建 MainViewModel 及其依赖的 ViewModel 实例。
@@ -35,8 +37,11 @@ class MainViewModelFactory(
                 val deviceViewModel = createDeviceViewModel()
                 val switchControlViewModel = createSwitchControlViewModel()
                 val loginViewModel = createLoginViewModel()
+                val mqttEventHandler = MqttEventHandler(linkRepository)
+                val mqttSubscriptionManager = MqttSubscriptionManager(mqttEventHandler)
+
                 @Suppress("UNCHECKED_CAST")
-                MainViewModel(deviceViewModel, switchControlViewModel, loginViewModel) as T
+                MainViewModel(deviceViewModel, switchControlViewModel, loginViewModel,mqttSubscriptionManager) as T
             }
             modelClass.isAssignableFrom(LinkViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")

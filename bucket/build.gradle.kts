@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
 }
+val APP_VERSION_CODE: String  by project
+val APP_VERSION_NAME: String by project
 
 android {
     namespace = "com.tji.bucket"
@@ -13,8 +15,9 @@ android {
         applicationId = "com.tji.bucket"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+
+        versionCode = APP_VERSION_CODE.toInt()
+        versionName = APP_VERSION_NAME
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,6 +40,8 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true  // 添加这一行
+
     }
     // 添加 packaging 配置
     packaging {

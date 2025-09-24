@@ -1,6 +1,7 @@
 package com.tji.bucket.ui.components
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,6 +39,8 @@ import com.tji.bucket.data.viewmodel.LinkViewModel
 import com.tji.bucket.data.viewmodel.LoginViewModel
 import com.tji.bucket.data.viewmodel.MainViewModel
 import com.tji.bucket.data.viewmodel.SwitchViewModel
+import com.tji.bucket.service.MqttEventHandler
+import com.tji.bucket.service.MqttSubscriptionManager
 import com.tji.bucket.ui.main.SwitchItemComposable
 
 // LinkItem 组件
@@ -49,6 +52,7 @@ fun LinkItem(
 ) {
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    val Tag = "LinkItem"
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -72,6 +76,7 @@ fun LinkItem(
                 ) {
                     Text(
                         text = link.deviceName,
+
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF1A1A1A)
@@ -80,6 +85,8 @@ fun LinkItem(
                     Spacer(modifier = Modifier.width(8.dp))
                     StatusChip(isOnline = link.isOnline)
                 }
+
+                Log.d(Tag,"${link.deviceName}ddddddddddddddd")
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -189,10 +196,13 @@ fun LinkItemPreview() {
     val fakeLinkRepository = LinkRepo()
     val fakeSwitchRepository = SwitchRepo()
     val authRepository = AuthRepo()
+    val mqttEventHandler = MqttEventHandler(fakeLinkRepository)
+
     val mainViewModel = MainViewModel(
         LinkViewModel(fakeLinkRepository),
         SwitchViewModel(fakeSwitchRepository),
-        LoginViewModel(authRepository)
+        LoginViewModel(authRepository),
+        MqttSubscriptionManager(mqttEventHandler)
     )
 
     MaterialTheme {
